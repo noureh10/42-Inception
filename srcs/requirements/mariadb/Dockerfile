@@ -1,10 +1,12 @@
 FROM debian:bookworm
 
-RUN apt-get update && sudo apt-get upgrade -y
-RUN apt install mariadb -y
+RUN apt-get update && apt-get upgrade -y
+RUN apt install -y mariadb-server mariadb-client gettext
 
-COPY rscs/init.sql /docker-entrypoint-initdb.d/init.sql
+COPY rscs/init.sql.template /rscs/init.sql.template
+COPY rscs/entrypoint.sh /rscs/entrypoint.sh 
+RUN chmod +x /rscs/entrypoint.sh 
 
 EXPOSE 3306
 
-CMD ["mysqld"]
+ENTRYPOINT ["/rscs/entrypoint.sh"]
