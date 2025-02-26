@@ -1,27 +1,31 @@
 DOCKER_CMPS = srcs/docker-compose.yml
-DATABASE_VOLUME = /home/nechaara/volumes/mysql
-WORDPRESS_VOLUME = /home/nechaara/volumes/wordpress
+DATABASE_VOLUME = /home/nechaara/data/mysql
+WORDPRESS_VOLUME = /home/nechaara/data/wordpress
 
 all: build
 
 build:
 	mkdir -p $(DATABASE_VOLUME)
 	mkdir -p $(WORDPRESS_VOLUME)
-	docker-compose -f $(DOCKER_CMPS) up --build -d
+	sudo docker-compose -f $(DOCKER_CMPS) up --build -d
 
 restart:
-	docker-compose restart
+	sudo docker-compose restart
 
 stop:
-	docker-compose -f $(DOCKER_CMPS) stop
+	sudo docker-compose -f $(DOCKER_CMPS) stop
 
 down:
-	docker-compose -f $(DOCKER_CMPS) down
+	sudo docker-compose -f $(DOCKER_CMPS) down
 
 clean : down
-	docker container prune --force
+	sudo docker container prune --force
+	sudo docker volume prune --force
+	sudo docker network prune --force
 
 fclean : clean
+	sudo docker image prune --all --force
 	
-
+re : fclean
+	sudo docker-compose -f $(DOCKER_CMPS) up --build -d
 
