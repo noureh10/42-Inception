@@ -1,43 +1,53 @@
+version: '3.9'
+
 networks:
-  inception_nt:
+  inception:
     driver: bridge
 
 services:
   mariadb:
     container_name: mariadb
-    build : ./requirements/mariadb
-    restart: always
-    networks: [inception_nt]
+    build: ./requirements/mariadb
+    env_file:
+      - .env
+    networks: 
+      - inception
+    volumes:
+      - mariadb:/var/lib/mysql
 
   nginx:
     container_name: nginx
-    build : ./requirements/nginx
-    depends_on: 
+    build: ./requirements/nginx
+    depends_on:
       - wordpress
-    restart: always
-    networks: [inception_nt]
-    ports: ["443:443"]
-    
+    networks:
+      - inception
+    ports:
+      - "443:443"
+
   wordpress:
-    container_name: "wordpress"
-    build : ./requirements/wordpress
-    depends_on: 
+    container_name: wordpress
+    build: ./requirements/wordpress
+    depends_on:
       - mariadb
-    restart: always
-    networks: [inception_nt]
+    env_file:
+      - .env
+    networks:
+      - inception
+    volumes:
+      - wordpress:/var/www/html
 
 volumes:
   mariadb:
     driver: local
     driver_opts:
       type: none
-      device: /home/nechaara/volumes/mysql
+      device: /home/nechaara/data/mysql
       o: bind
-  
+
   wordpress:
     driver: local
     driver_opts:
       type: none
-      device: /home/nechaara/volumes/wordpress
+      device: /home/nechaara/data/wordpress
       o: bind
-
